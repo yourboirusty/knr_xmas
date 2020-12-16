@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+import random
 from pathlib import Path
 import shutil
 
@@ -15,15 +16,29 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello"}
 
+
 @app.post("/img/")
-async def get_image(file: UploadFile = File(...)):
-    print(file)
+async def post_image(file: UploadFile = File(...)):
     try:
-        with Path('static/image.png').open('wb') as buffer:
+        name = random.getrandbits(32)
+        with Path('static/%x.png' % name).open('wb') as buffer:
             shutil.copyfileobj(file.file, buffer)
     finally:
         file.file.close()
+
+
+@app.get("/img/")
+async def get_image():
+    path = Path('static/')
+    images = [
+        str(img).split('/')[1]
+        for img in path.iterdir()
+        if '.png' in str(img) and path.is_dir()
+        ]
+    return {'images': images}
