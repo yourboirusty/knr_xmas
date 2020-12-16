@@ -1,3 +1,4 @@
 .history
 backend/__pycache__
 frontend/.eslintcache
+backend/static
