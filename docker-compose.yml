@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  back:
+    container_name: 'xmas_back'
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+  front:
+    container_name: 'xmas_front'
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - ./backend/static:/app/public/back:ro
