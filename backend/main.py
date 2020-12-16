@@ -6,8 +6,10 @@ import shutil
 
 app = FastAPI()
 origins = [
+    "*",
     "http://localhost:3000",
     "http://localhost:8000",
+
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -24,14 +26,24 @@ async def root():
 
 
 @app.post("/img/")
-async def post_image(file: UploadFile = File(...)):
+async def post_image(file: UploadFile = File(...), color: str = '0xFF0000'):
     try:
-        name = random.getrandbits(32)
-        with Path('static/%x.png' % name).open('wb') as buffer:
+        name = "c%s_%x.png" % (color, random.getrandbits(32))
+        with Path('static/' + name).open('wb') as buffer:
             shutil.copyfileobj(file.file, buffer)
+        return {'image': name}
     finally:
         file.file.close()
 
+
+@app.post('/img/{img_url}')
+async def post_detail_image(img_url, file: UploadFile = File(...)):
+    try:
+        with Path('static/' + img_url).open('wb') as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        return {'image': img_url}
+    finally:
+        file.file.close()
 
 @app.get("/img/")
 async def get_image():
