@@ -2,19 +2,18 @@ import React from 'react';
 import logo from './logo.svg';
 import { Counter } from './features/counter/Counter';
 import DrawingCanvas from './features/canvas/DrawingCanvas';
-import {Scene} from './features/threeD/threeD';
+import { Container } from '@material-ui/core';
+import {Scene, Other} from './features/threeD/threeD';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-      </header>
+    <Container className="App">
+
       <DrawingCanvas/>
       <Scene/>
-    </div>
+      <Other/>
+    </Container>
   );
 }
 
