@@ -38,7 +38,6 @@ export const { addOrnament, setOrnament } = ornamentListSlice.actions;
 export const selectOrnaments = state => state.ornament_list.ornaments;
 
 export const syncOrnamentsAsync = url => dispatch => {
-    setTimeout(() => {
         let ornaments = [];
         api.get(url)
         .then((response) => {
@@ -51,7 +50,6 @@ export const syncOrnamentsAsync = url => dispatch => {
         dispatch(setOrnament(ornaments));
     }
     )
-    }, 15000);
 }
 
 const ornamentReducer = ornamentSlice.reducer
