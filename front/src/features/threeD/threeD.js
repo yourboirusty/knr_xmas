@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import {Grid} from '@material-ui/core'
 import { Canvas, useFrame } from 'react-three-fiber'
 import {selectImageData,} from '../canvas/imageSlice'
 import {selectColor, selectOrnaments, syncOrnamentsAsync} from './ornamentSlice'
@@ -76,30 +77,25 @@ export function Other(){
   const dispatch = useDispatch();
   const ornament_list = useSelector(selectOrnaments)
   useEffect(()=>{
-    dispatch(syncOrnamentsAsync('img/'))
+    setTimeout(() => {
+    dispatch(syncOrnamentsAsync('img/'))}, 5000)
   })
   
 
 return(
-  <Canvas
-  camera={{position: [0, 1, 7], near:2, far:15}}>
-         <ambientLight />
-     <pointLight position={[10, 10, 10]} />
-
-  <Flex justifyContent="center" alignItems='center'>
-  {ornament_list.map((item, index)=>{
+  <Grid container>
+       {ornament_list.map((item, index)=>{
     if(item){
       console.log(process.env.PUBLIC_URL)
       let texture = new THREE.TextureLoader().load(process.env.PUBLIC_URL+'back/'+item.texture)
       let color = new THREE.Color(parseInt(item.color))
-    return <Box key={index}> <Ball texture={texture} color={color}/> </Box>
-    }
-    else{
-      return <div></div>
-    }
-  })}
-  </Flex>
-  </Canvas>
+    return <Grid item> <Canvas camera={{position: [0, 1, 7], near:2, far:15}}> <ambientLight /> <pointLight position={[10, 10, 10]} /><Box centerAnchor  width="auto" height="auto" key={index}> <Ball texture={texture} color={color}/></Box></Canvas></Grid>
+}
+else{
+  return <div></div>
+}
+})}
+</Grid>
 )
 }
 
