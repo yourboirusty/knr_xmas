@@ -9,9 +9,9 @@ services:
       - ./backend:/app
   front:
     container_name: 'xmas_front'
-    build: ./frontend
+    build: ./front
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app
+      - ./front:/app
       - ./backend/static:/app/public/back:ro

@@ -49,7 +49,9 @@ async def post_detail_image(img_url, file: UploadFile = File(...)):
 async def get_image():
     path = Path('static/')
     images = [
-        str(img).split('/')[1]
+        {'file':str(img).split('/')[1],
+        'color': str(img).split('/')[1].split('_')[0][1:]
+        }
         for img in path.iterdir()
         if '.png' in str(img) and path.is_dir()
         ]

@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import api from "../../app/axios";
 import CanvasDraw from "react-canvas-draw";
 import { useCookies } from 'react-cookie';
 import { useSelector, useDispatch } from 'react-redux';
+import {selectColor, setColor} from '../threeD/ornamentSlice';
+import { Button, Grid, Container } from '@material-ui/core';
+
 import {
   setUrl,
   setImg,
@@ -17,14 +20,19 @@ import ColorPicker from 'material-ui-color-picker';
     let height = 400;
     let url='img/'
     const [radius, setRadius] = useState(12)
-    const [color, setColor] = useState("#FF0000")
+    const [color, setDrawColor] = useState("#FF0000")
     let saveableCanvas = React.createRef();
     const imageData = useSelector(selectImageData);
     const imageUrl = useSelector(selectImageUrl);
     const dispatch = useDispatch();
+    useEffect(() =>{
     if (cookies.img_url) {
       dispatch(setUrl(cookies.img_url))
     }
+    if (cookies.bombka_color){
+      dispatch(setColor(cookies.bombka_color))
+    }
+  })
 
     function saveImg(){
       saveableCanvas.canvasContainer.children[1].toBlob(blob => {
@@ -35,64 +43,64 @@ import ColorPicker from 'material-ui-color-picker';
         }
         api.post(url, formData).then( response => {
           setCookie('img_url', response.data.image, { path: '/' });
-          console.log(cookies)
           dispatch(setUrl(response.data.image));
         }
         );}
           )
       };
     function saveChanges(){
-      let img = new Image();
-      img.src = 
-        dispatch(setImg(saveableCanvas.canvasContainer.children[1].toDataURL()));
+      dispatch(setImg(saveableCanvas.canvasContainer.children[1].toDataURL()));
     };
+    function setBombkaColor(color){
+      dispatch(setColor(color));
+    }
     return (
-      <div>
-        <div>
-          <button
+      <Grid container spacing={5}>
+        <Grid item xs={12} >
+          <Button
             onClick={saveImg}
           >
             Save
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               saveableCanvas.clear();
               saveChanges()
             }}
           >
             Clear
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               saveableCanvas.undo();
               saveChanges()
             }}
           >
             Undo
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               setRadius(24)
             }}
           >
             Bigger
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               setRadius(12)
             }}
           >
             Normal
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               setRadius(6)
             }}
           >
             Smol
-          </button>
+          </Button>
 
-        </div>
+        </Grid>
         <CanvasDraw
           onChange={saveChanges}
           ref={canvasDraw => (saveableCanvas = canvasDraw)}
@@ -102,11 +110,16 @@ import ColorPicker from 'material-ui-color-picker';
           brushRadius={radius}
 
         />
-                  <ColorPicker
+             <ColorPicker
           name='color'
-          defaultValue="#FF0000"
-          onChange={color => setColor(color)}
-          />
-      </div>
+          defaultValue="Drawing color"
+          onChange={color => setDrawColor(color)}
+          />    
+          <ColorPicker
+          name='bombka_color'
+          defaultValue="Bombka color"
+          onChange={bombka_color => setBombkaColor(bombka_color)}
+          />    
+      </Grid>
     );
   }

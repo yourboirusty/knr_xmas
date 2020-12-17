@@ -1,7 +1,10 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Canvas, useFrame } from 'react-three-fiber'
 import {selectImageData,} from '../canvas/imageSlice'
+import {selectColor} from './ornamentSlice'
 import * as THREE from 'three'
+import api from "../../app/axios";
+import { Flex, Box } from 'react-three-flex'
 import { useSelector } from 'react-redux';
 
 export function Ball(props){
@@ -12,11 +15,8 @@ export function Ball(props){
   const texture = childProps.texture
   const color = childProps.color
   let vel = 0;
-  console.log(color)
-  console.log(texture)
   delete childProps.texture
   delete childProps.color
-  console.log(childProps)
   // let url = process.env.PUBLIC_URL + '/back/image.png' 
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
   useFrame(() => {
@@ -57,7 +57,7 @@ export function Ball(props){
 export function Scene(){
   let image = useSelector(selectImageData)
   const texture = new THREE.TextureLoader().load(image)
-  const color = new THREE.Color( 'green' )
+  const color = useSelector(selectColor)
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 3)
 camera.position.set(-1, 1.2, 1.5)
 camera.lookAt(0, 0, 0)
@@ -70,7 +70,41 @@ return(
   <Ball position={[3, 0, 0]} texture={texture} color={color}/>
   </Canvas>
 )
+}
 
+export function Other(){
+  const [ornament_list, setList] = useState([])
+  let ornaments = [];
+  useEffect(()=>{
+    api.get('img/')
+    .then((response) => {
+      response.data.images.map((item)=>{
+      ornaments.push(
+        {
+          texture: new THREE.TextureLoader().load('back/'+item.file),
+          color: item.color
+        }
+      )
+    })
+    setList(ornaments)
+    }
+    )
+  })
+  
 
+return(
+  <Canvas
+  camera={{position: [0, 1, 7], near:2, far:15}}>
+         <ambientLight />
+     <pointLight position={[10, 10, 10]} />
+
+  <Flex justifyContent="center" alignItems='center'>
+  {ornament_list.map((item, index)=>{
+    return <Box key={index}> <Ball texture={item.texture} color={item.color}/> </Box>
+ 
+  })}
+  </Flex>
+  </Canvas>
+)
 }
 
