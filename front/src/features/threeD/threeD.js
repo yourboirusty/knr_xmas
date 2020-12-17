@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Canvas, useFrame } from 'react-three-fiber'
 import {selectImageData,} from '../canvas/imageSlice'
-import {selectColor} from './ornamentSlice'
+import {selectColor, selectOrnaments, syncOrnamentsAsync} from './ornamentSlice'
 import * as THREE from 'three'
 import api from "../../app/axios";
 import { Flex, Box } from 'react-three-flex'
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 export function Ball(props){
 
@@ -73,22 +73,10 @@ return(
 }
 
 export function Other(){
-  const [ornament_list, setList] = useState([])
-  let ornaments = [];
+  const dispatch = useDispatch();
+  const ornament_list = useSelector(selectOrnaments)
   useEffect(()=>{
-    api.get('img/')
-    .then((response) => {
-      response.data.images.map((item)=>{
-      ornaments.push(
-        {
-          texture: new THREE.TextureLoader().load('back/'+item.file),
-          color: item.color
-        }
-      )
-    })
-    setList(ornaments)
-    }
-    )
+    dispatch(syncOrnamentsAsync('img/'))
   })
   
 
@@ -100,8 +88,15 @@ return(
 
   <Flex justifyContent="center" alignItems='center'>
   {ornament_list.map((item, index)=>{
-    return <Box key={index}> <Ball texture={item.texture} color={item.color}/> </Box>
- 
+    if(item){
+      console.log(process.env.PUBLIC_URL)
+      let texture = new THREE.TextureLoader().load(process.env.PUBLIC_URL+'back/'+item.texture)
+      let color = new THREE.Color(parseInt(item.color))
+    return <Box key={index}> <Ball texture={texture} color={color}/> </Box>
+    }
+    else{
+      return <div></div>
+    }
   })}
   </Flex>
   </Canvas>
