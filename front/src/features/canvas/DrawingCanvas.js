@@ -36,8 +36,11 @@ import ColorPicker from 'material-ui-color-picker';
 
     function saveImg(){
       saveableCanvas.canvasContainer.children[1].toBlob(blob => {
+        console.log(process.env.PUBLIC_URL)
         const formData = new FormData();
-        formData.append('file', blob, 'test.png');
+        formData.append('color', cookies.bombka_color)
+        console.log(formData)
+        formData.append('file', blob, (cookies.bombka_color + '.png'));
         if (imageUrl){
           url = 'img/'+imageUrl
         }
@@ -52,7 +55,10 @@ import ColorPicker from 'material-ui-color-picker';
       dispatch(setImg(saveableCanvas.canvasContainer.children[1].toDataURL()));
     };
     function setBombkaColor(color){
-      dispatch(setColor(color));
+      if (color){
+        setCookie('bombka_color', color);
+        dispatch(setColor(color));
+      }
     }
     return (
       <Grid container spacing={5}>
